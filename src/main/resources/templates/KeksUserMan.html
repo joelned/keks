@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keks Admin Dashboard</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f5eb;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Variables */
+        :root {
+            --primary-color: #d5b54d;
+            --primary-light: #f8f5eb;
+            --primary-dark: #b89a3e;
+            --border-color: #e9ddb5;
+            --text-color: #333;
+            --text-muted: #666;
+            --white: #fff;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #eab308;
+            --blue: #3b82f6;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .sidebar-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-group-label {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu-item {
+            padding: 0.5rem 1rem;
+        }
+
+        .sidebar-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            width: 100%;
+            border-radius: 0.375rem;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu-button:hover {
+            background-color: var(--primary-light);
+        }
+
+        .sidebar-menu-button.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details {
+            font-size: 0.875rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .header-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        /* Dashboard Content */
+        .dashboard {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background-color: var(--primary-light);
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th.text-right {
+            text-align: right;
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table td.text-right {
+            text-align: right;
+        }
+
+        .table-search {
+            position: relative;
+            width: 16rem;
+        }
+
+        .table-search input {
+            width: 100%;
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: rgb(22, 101, 52);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: rgb(153, 27, 27);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--red);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Reviews */
+        .review-card {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .review-card.hidden {
+            display: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .reviewer {
+            font-weight: 600;
+        }
+
+        .review-date {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .rating {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .review-content {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Customer Card */
+        .customer-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .customer-card.hidden {
+            display: none;
+        }
+
+        .customer-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-details {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .customer-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .customer-stat {
+            font-size: 0.75rem;
+        }
+
+        .customer-stat-value {
+            font-weight: 600;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            padding: 1.5rem 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: var(--white);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 300px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast-icon.success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--green);
+        }
+
+        .toast-icon.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--red);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-title, .sidebar-group-label, .sidebar-menu-button span, .user-details {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">Keks Admin</h1>
+        </div>
+        <div class="sidebar-content">
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Dashboard</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <button class="sidebar-menu-button" data-section="overview">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            <span>Overview</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Management</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <button class="sidebar-menu-button" onclick="window.location.href ='Riders.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Riders</span>
+                        </button>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <button class="sidebar-menu-button active" onclick="window.location.href ='Customers.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Customers</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Finance</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <button class="sidebar-menu-button" onclick="window.location.href ='KeksEarnings.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                            <span>Earnings</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Settings</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <button class="sidebar-menu-button" onclick="window.location.href ='KeksUserMan.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.5 17.5 7 20l2-1 2 1 .5-2.5"/><path d="M6.5 6.5 7 4l2 1 2-1 .5 2.5"/><path d="M17.5 17.5 17 20l-2-1-2 1-.5-2.5"/><path d="M17.5 6.5 17 4l-2 1-2-1-.5 2.5"/></svg>
+                            <span>User Management</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div class="user-details">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-email">admin@keks.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="header">
+            <h1 class="header-title">Keks Admin User Management</h1>
+        </header>
+
+        <div class="dashboard">
+            <div class="tabs">
+                <div class="tab" onclick="switchTab('riders')">Rider Management</div>
+                <div class="tab active" onclick="switchTab('reviews')">Customer Reviews</div>
+            </div>
+
+            <!-- Riders Tab -->
+            <div id="riders-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Riders List</h2>
+                        <div class="table-search">
+                            <input type="text" placeholder="Search riders..." id="rider-search">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Rider Name</th>
+                                        <th>ID</th>
+                                        <th>Location</th>
+                                        <th>Last Active</th>
+                                        <th>Rides Today</th>
+                                        <th>Rating</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="riders-table-body">
+                                    <tr data-rider-id="1">
+                                        <td>Adebayo Johnson</td>
+                                        <td>Keks-001</td>
+                                        <td>Babcock</td>
+                                        <td>10 mins ago</td>
+                                        <td>32</td>
+                                        <td>4.8/5</td>
+                                        <td>
+                                            <span class="status-badge active">Active</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-danger remove-rider">Remove</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-rider-id="2">
+                                        <td>Chioma Okafor</td>
+                                        <td>Keks-002</td>
+                                        <td>Babcock</td>
+                                        <td>5 mins ago</td>
+                                        <td>28</td>
+                                        <td>4.6/5</td>
+                                        <td>
+                                            <span class="status-badge active">Active</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-danger remove-rider">Remove</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-rider-id="3">
+                                        <td>Emmanuel Nwachukwu</td>
+                                        <td>Keks-003</td>
+                                        <td>Babcock</td>
+                                        <td>2 mins ago</td>
+                                        <td>25</td>
+                                        <td>4.7/5</td>
+                                        <td>
+                                            <span class="status-badge active">Active</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-danger remove-rider">Remove</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-rider-id="4">
+                                        <td>Fatima Ibrahim</td>
+                                        <td>Keks-004</td>
+                                        <td>Babcock</td>
+                                        <td>1 hour ago</td>
+                                        <td>18</td>
+                                        <td>4.5/5</td>
+                                        <td>
+                                            <span class="status-badge inactive">Inactive</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-danger remove-rider">Remove</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-rider-id="5">
+                                        <td>Gabriel Okonkwo</td>
+                                        <td>Keks-005</td>
+                                        <td>Babcock</td>
+                                        <td>30 mins ago</td>
+                                        <td>22</td>
+                                        <td>4.9/5</td>
+                                        <td>
+                                            <span class="status-badge active">Active</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-danger remove-rider">Remove</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Tab -->
+            <div id="reviews-tab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Customer Reviews</h2>
+                        <div class="table-search">
+                            <input type="text" placeholder="Search reviews..." id="review-search">
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="review-card" data-review-id="1">
+                            <div class="review-header">
+                                <span class="reviewer">Laminga Maryam</span>
+                                <span class="review-date">March 17, 2025</span>
+                            </div>
+                            <div class="rating">★★★★★</div>
+                            <p class="review-content">The rider was very professional and delivered my order on time. The food was still hot when it arrived. Great service!</p>
+                        </div>
+
+                        <div class="review-card" data-review-id="2">
+                            <div class="review-header">
+                                <span class="reviewer">Ololademi Asake</span>
+                                <span class="review-date">March 16, 2025</span>
+                            </div>
+                            <div class="rating">★★★★☆</div>
+                            <p class="review-content">Good service overall. The rider was polite, but the delivery took a bit longer than expected.</p>
+                        </div>
+
+                        <div class="review-card" data-review-id="3">
+                            <div class="review-header">
+                                <span class="reviewer">Akinisho Kolade</span>
+                                <span class="review-date">March 15, 2025</span>
+                            </div>
+                            <div class="rating">★★★★★</div>
+                            <p class="review-content">Excellent service! The rider was very friendly and the delivery was super fast. Will definitely order again!</p>
+                        </div>
+
+                        <div class="review-card" data-review-id="4">
+                            <div class="review-header">
+                                <span class="reviewer">Blessing Nnamdi</span>
+                                <span class="review-date">March 14, 2025</span>
+                            </div>
+                            <div class="rating">★★★☆☆</div>
+                            <p class="review-content">The food was good, but the packaging was damaged during delivery. The rider apologized for the inconvenience.</p>
+                        </div>
+
+                        <div class="review-card" data-review-id="5">
+                            <div class="review-header">
+                                <span class="reviewer">Chinedu Obi</span>
+                                <span class="review-date">March 13, 2025</span>
+                            </div>
+                            <div class="rating">★★★★★</div>
+                            <p class="review-content">Perfect delivery! The rider followed all my instructions and was very courteous. The food was exactly as ordered.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Customer Management</h2>
+                        <button class="btn btn-sm btn-outline" id="view-all-customers">View All</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="customer-card" data-customer-id="1">
+                            <div class="customer-avatar">LM</div>
+                            <div class="customer-info">
+                                <div class="customer-name">Laminga Maryam</div>
+                                <div class="customer-details">+234 812 345 6789 • Crystal</div>
+                                <div class="customer-stats">
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">42</div>
+                                        <div>Total Rides</div>
+                                    </div>
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">₦9,240</div>
+                                        <div>Spent</div>
+                                    </div>
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">4.8/5</div>
+                                        <div>Rating</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="customer-card" data-customer-id="2">
+                            <div class="customer-avatar">OA</div>
+                            <div class="customer-info">
+                                <div class="customer-name">Ololademi Asake</div>
+                                <div class="customer-details">+234 803 456 7890 • Topaz</div>
+                                <div class="customer-stats">
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">28</div>
+                                        <div>Total Rides</div>
+                                    </div>
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">₦6,160</div>
+                                        <div>Spent</div>
+                                    </div>
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">4.5/5</div>
+                                        <div>Rating</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="customer-card" data-customer-id="3">
+                            <div class="customer-avatar">AK</div>
+                            <div class="customer-info">
+                                <div class="customer-name">Akinisho Kolade</div>
+                                <div class="customer-details">+234 705 678 9012 • Neal Wilson</div>
+                                <div class="customer-stats">
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">15</div>
+                                        <div>Total Rides</div>
+                                    </div>
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">₦3,300</div>
+                                        <div>Spent</div>
+                                    </div>
+                                    <div class="customer-stat">
+                                        <div class="customer-stat-value">4.9/5</div>
+                                        <div>Rating</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Action</h3>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this rider? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-action">Cancel</button>
+                <button class="btn btn-danger" id="confirm-action">Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Global variables
+        let currentRiderId = null;
+        
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const sidebarButtons = document.querySelectorAll('.sidebar-menu-button');
+        const riderSearch = document.getElementById('rider-search');
+        const reviewSearch = document.getElementById('review-search');
+        const viewAllCustomersBtn = document.getElementById('view-all-customers');
+        const removeRiderBtns = document.querySelectorAll('.remove-rider');
+        const confirmModal = document.getElementById('confirm-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelActionBtn = document.getElementById('cancel-action');
+        const confirmActionBtn = document.getElementById('confirm-action');
+        const toastContainer = document.getElementById('toast-container');
+        
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to the clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Sidebar navigation
+        sidebarButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all sidebar buttons
+                sidebarButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Get the section to show
+                const section = button.getAttribute('data-section');
+                
+                // Handle section switching
+                if (section === 'riders') {
+                    switchTab('riders');
+                } else if (section === 'reviews') {
+                    switchTab('reviews');
+                } else {
+                    // For other sections, we would normally navigate to a different page
+                    // For this demo, just show a toast notification
+                    showToast('Navigation', `Navigating to ${section} section`, 'success');
+                }
+            });
+        });
+        
+        // Search functionality
+        riderSearch.addEventListener('input', () => {
+            const searchTerm = riderSearch.value.toLowerCase();
+            const riders = document.querySelectorAll('#riders-table-body tr');
+            
+            riders.forEach(rider => {
+                const riderName = rider.querySelector('td:first-child').textContent.toLowerCase();
+                const riderId = rider.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                
+                if (riderName.includes(searchTerm) || riderId.includes(searchTerm)) {
+                    rider.style.display = '';
+                } else {
+                    rider.style.display = 'none';
+                }
+            });
+        });
+        
+        reviewSearch.addEventListener('input', () => {
+            const searchTerm = reviewSearch.value.toLowerCase();
+            const reviews = document.querySelectorAll('.review-card');
+            
+            reviews.forEach(review => {
+                const reviewer = review.querySelector('.reviewer').textContent.toLowerCase();
+                const content = review.querySelector('.review-content').textContent.toLowerCase();
+                
+                if (reviewer.includes(searchTerm) || content.includes(searchTerm)) {
+                    review.style.display = '';
+                } else {
+                    review.style.display = 'none';
+                }
+            });
+        });
+        
+        // View All Customers button
+        viewAllCustomersBtn.addEventListener('click', () => {
+            showToast('Navigation', 'Viewing all customers', 'success');
+        });
+        
+        // Remove Rider functionality
+        removeRiderBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const riderRow = btn.closest('tr');
+                currentRiderId = riderRow.getAttribute('data-rider-id');
+                openModal();
+            });
+        });
+        
+        // Modal functionality
+        function openModal() {
+            confirmModal.classList.add('active');
+        }
+        
+        function closeModal() {
+            confirmModal.classList.remove('active');
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelActionBtn.addEventListener('click', closeModal);
+        
+        confirmActionBtn.addEventListener('click', () => {
+            // Remove the rider
+            const riderRow = document.querySelector(`tr[data-rider-id="${currentRiderId}"]`);
+            const riderName = riderRow.querySelector('td:first-child').textContent;
+            
+            riderRow.remove();
+            closeModal();
+            showToast('Rider Removed', `${riderName} has been removed from the system`, 'success');
+        });
+        
+        // Toast notification functionality
+        function showToast(title, message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            toast.innerHTML = `
+                <div class="toast-icon ${type}">
+                    ${type === 'success' ? 
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : 
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'}
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show the toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Remove the toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial active tab
+            switchTab('reviews');
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

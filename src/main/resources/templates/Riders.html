@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keks - Registered Riders</title>
+    <style>
+        :root {
+            --primary: #d6c860;
+            --primary-light: #e6d98a;
+            --primary-dark: #b5a840;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+            --background: #f9f7e8;
+            --card-bg: #ffffff;
+            --border: #e0d980;
+            --admin-highlight: #e6b860;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 30px;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            color: var(--primary-dark);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .sidebar-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-group-label {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu-item {
+            padding: 0.5rem 1rem;
+        }
+
+        .sidebar-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            width: 100%;
+            border-radius: 0.375rem;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu-button:hover {
+            background-color: var(--primary-light);
+        }
+
+        .sidebar-menu-button.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details {
+            font-size: 0.875rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 0.75rem;
+        }
+
+        /* Main Content Styles */
+        .main-wrapper {
+            flex: 1;
+            margin-left: 250px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            padding: 16px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .admin-badge {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--primary);
+            color: var(--text-dark);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+        }
+
+        .back-arrow {
+            width: 20px;
+            height: 20px;
+            position: relative;
+        }
+
+        .back-arrow::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg);
+            left: 5px;
+            top: 5px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .add-rider-btn {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .add-rider-btn:hover {
+            background-color: #a59738;
+            transform: translateY(-2px);
+        }
+
+        .riders-table-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .riders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .riders-table th {
+            background-color: var(--primary-light);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .riders-table td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .riders-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .riders-table tr:hover {
+            background-color: rgba(214, 200, 96, 0.05);
+        }
+
+        .rider-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rider-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .rider-name {
+            font-weight: 600;
+        }
+
+        .rider-id {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .status-inactive {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+
+        .status-pending {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .pagination-info {
+            color: #666;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: var(--card-bg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .pagination-btn:hover:not(.active) {
+            background-color: var(--primary-light);
+            border-color: var(--primary-light);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-title, .sidebar-group-label, .sidebar-menu-button span, .user-details {
+                display: none;
+            }
+            
+            .main-wrapper {
+                margin-left: 60px;
+            }
+            
+            .riders-table-container {
+                overflow-x: auto;
+            }
+            
+            .riders-table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">Keks Admin</h1>
+
+        </div>
+        <div class="sidebar-content">
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Dashboard</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/admin-dashboard}" style="text-decoration: none;"><button class="sidebar-menu-button active">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            <span>Overview</span>
+                        </button></a>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Management</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/admin-riders}" style="text-decoration: none;"><button class="sidebar-menu-button" onclick="window.location.href ='Riders.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Riders</span>
+                        </button></a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/admin-customers}" style="text-decoration: none;"><button class="sidebar-menu-button"onclick="window.location.href ='Customers.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Customers</span>
+                        </button></a>
+                    </li>
+
+
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Finance</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/earnings}" style="text-decoration: none;"><button class="sidebar-menu-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                            <span>Earnings</span>
+                        </button></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div class="user-details">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-email">admin@keks.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <header>
+            <div class="container header-content">
+                <div class="logo">Keks</div>
+                <div class="admin-badge">Admin Dashboard</div>
+            </div>
+        </header>
+
+        <div class="container">
+            <h1 class="page-title">Registered Riders</h1>
+            <p class="page-subtitle">Manage all keke riders registered on the platform</p>
+
+
+            <div class="riders-table-container">
+                <table class="riders-table">
+                    <thead>
+                        <tr>
+                            <th>Rider</th>
+                            <th>Contact</th>
+                            <th>Vehicle Info</th>
+                            <th>Area</th>
+                            <th>Joined</th>
+                            <th>Status</th>
+                            <th>Trips</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="rider : ${riders}">
+                            <div th:each="trips: ${ridesPerRider}">
+                            <td>
+                                <div class="rider-info">
+                                    <div th:text="${#strings.substring(rider.firstName, 0, 2)}" class="rider-avatar"></div>
+                                    <div>
+                                        <div th:text="${rider.firstName} + ' '+ ${rider.lastName}" class="rider-name"></div>
+                                        <div th:text="'ID: ' + ${rider.riderId}" class="rider-id"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div th:text="${rider.phoneNumber}"></div>
+                            </td>
+                            <td>
+                                <div>TVS King</div>
+                                <div th:text="${rider.kekePlateNumber}" style="font-size: 14px; color: #666;"></div>
+                            </td>
+                            <td>Babcock University</td>
+                            <td th:text="${rider.dateJoined}"></td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td th:text="${trips.value}"></td>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <div class="pagination-controls">
+                    <button class="pagination-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

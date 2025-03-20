@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEKS - University Keke Transportation</title>
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-yellow: #ffd447;
+            --secondary-yellow: #d5b54d;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --light-bg: #f9f9f9;
+            --accent-dark: #8d7b2f;
+            --accent-light: #fff5d1;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            background-size: cover;  
+            background-position: center; 
+            background-repeat: no-repeat;
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        /* Header Styles */
+        .header {
+            background-color: var(--primary-yellow);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--light-text);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .nav-item.active {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+            font-weight: bold;
+        }
+        
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background-color: var(--secondary-yellow);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: var(--light-text);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-content {
+            max-width: 60%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .welcome-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .welcome-text {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .welcome-section::after {
+            content: '🛺';
+            position: absolute;
+            right: 50px;
+            bottom: 20px;
+            font-size: 8rem;
+            opacity: 0.2;
+            z-index: 1;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-yellow);
+            color: var(--dark-text);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-dark);
+            color: var(--light-text);
+        }
+        
+        /* Quick Book Section */
+        .quick-book {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-yellow);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-light);
+        }
+        
+        .booking-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-yellow);
+        }
+        
+        .form-submit {
+            grid-column: 1 / -1;
+            text-align: right;
+        }
+
+        .form-divider {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .form-divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+        
+        .form-divider-text {
+            background-color: white;
+            padding: 0 15px;
+            position: relative;
+            z-index: 2;
+            color: var(--secondary-yellow);
+            font-weight: 600;
+        }
+        
+        /* Features Section */
+        .features-section {
+            margin-bottom: 30px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--accent-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--secondary-yellow);
+        }
+        
+        .feature-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Recent Rides Section */
+        .recent-rides {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .rides-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .rides-table th,
+        .rides-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .rides-table th {
+            background-color: var(--accent-light);
+            color: var(--accent-dark);
+            font-weight: 600;
+        }
+        
+        .rides-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .rides-table tr:hover td {
+            background-color: #f9f9f9;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background-color: #e6f7e6;
+            color: #2e7d32;
+        }
+        
+        .status-ongoing {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .status-scheduled {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+        
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 20px 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-menu {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .welcome-content {
+                max-width: 100%;
+            }
+            
+            .welcome-section::after {
+                display: none;
+            }
+            
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-submit {
+                text-align: center;
+            }
+            
+            .rides-table {
+                display: block;
+                overflow-x: auto;
+            }
+   
+
+    .btn-danger {
+      background-color: #d32f2f;
+    }
+
+    .btn-danger:hover {
+      background-color: #b71c1c;
+    }
+        }
+    </style>
+</head>
+<body>
+    <button id="logout-btn" class="btn btn-danger" style="position: absolute; top: 20px; right: 20px;">
+        Logout
+      </button>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">K</div>
+                <div class="logo-text">KEKS</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a th:href="@{/student-dashboard}" class="nav-item active">Home</a>
+                <a th:href="@{/profile}" class="nav-item">Profile</a>
+              
+                </nav>
+            
+            <div class="user-menu">
+               
+                <div th:text="${#strings.substring(student.name, 0, 1)}" class="user-avatar"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+       
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1 class="welcome-title">Welcome back, Student!</h1>
+                <p class="welcome-text">Need a ride around campus? Book a keke instantly or schedule for later. Safe, affordable, and convenient transportation at your fingertips.</p>
+                <a href="#" class="btn btn-primary">Book Now</a>
+            </div>
+        </section>
+        
+        <!-- Quick Book Section -->
+        <section class="quick-book">
+            <h2 class="section-title">Book Your Ride</h2>
+            <form class="booking-form" th:action="@{/find-ride}" method="get">
+                
+                
+                <!-- Custom location input fields -->
+                <div class="form-group">
+                    <label class="form-label">Custom Pickup Location</label>
+                    <input name= "pickUpLocation" id="pickUpLocation" type="text" class="form-control" placeholder="Enter your exact pickup location" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Custom Destination</label>
+                    <input name="destination"  id="destination" type="text" class="form-control" placeholder="Enter your exact destination" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Number of Passengers</label>
+                    <select class="form-control" id="numberOfPassengers" name="noOfPassengers" required>
+                        <option value="1">1 Person</option>
+                        <option value="2">2 People</option>
+                        <option value="3">3 People</option>
+                    </select>
+                </div>
+                
+                <div class="form-submit">
+                    <button type="submit" class="btn btn-primary">Find Keke</button>
+                </div>
+            </form>
+           <div th:if="${riders} != null" th:each="rider : ${riders}" >
+               <form class="booking-form" th:action="@{/api/v1/request-ride}" method="post">
+
+                   <div class="form-group">
+                       <label class="form-label">Rider Id</label>
+                       <input name="riderId" type="text" class="form-control" th:value="${rider.riderId}" readonly>
+                   </div>
+                   <input type="hidden" name="pickUpLocation" id="hiddenPickUpLocation" th:value="${pickUpLocation}">
+                   <input type="hidden" name="destination" id="hiddenDestination" th:value="${destination}">
+                   <input type="hidden" name="noOfPassengers" id="hiddenNumberOfPassengers" th:value="${numberOfPassengers}">
+                   <div class="form-group">
+                       <label class="form-label">Rider Name</label>
+                       <input type="text" class="form-control" th:value="${rider.firstName}" readonly>
+                   </div>
+
+                   <div class="form-group">
+                       <button type="submit" class="btn btn-primary">Book Rider</button>
+                   </div>
+               </form>
+           </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features-section">
+            <h2 class="section-title">Our Services</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">Instant Booking</h3>
+                    <p class="feature-text">Book a keke instantly and get picked up within minutes. No waiting in long queues or searching for transportation.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3 class="feature-title">Schedule Rides</h3>
+                    <p class="feature-text">Plan ahead by scheduling your rides for classes, events, or any other campus activities.</p>
+                </div>
+                
+               
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Safe & Secure</h3>
+                    <p class="feature-text">All our drivers are verified university staff. Track your ride in real-time for added security.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recent Rides Section -->
+        <section class="recent-rides">
+            <h2 class="section-title">Recent Rides</h2>
+            <table class="rides-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Driver</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Today, 10:30 AM</td>
+                        <td>FAD</td>
+                        <td>SAT</td>
+                        <td>Laminga Maryam</td>
+                        <td>₦200</td>
+                        <td><span class="status status-completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Yesterday, 2:15 PM</td>
+                        <td>Library</td>
+                        <td>Main Gate</td>
+                        <td>Laminga Maryam</td>
+                        <td>₦200</td>
+                        <td><span class="status status-completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Yesterday, 9:00 AM</td>
+                        <td>Neal wilson</td>
+                        <td>Cafeteria</td>
+                        <td>Laminga Maryam</td>
+                        <td>₦200</td>
+                        <td><span class="status status-completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Tomorrow, 8:30 AM</td>
+                        <td>Crystal</td>
+                        <td>Bucodel</td>
+                        <td>Pending</td>
+                        <td>₦200</td>
+                        <td><span class="status status-scheduled">Scheduled</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <div class="footer-bottom">
+            <p>&copy; 2023 KEKS - University Keke Transportation. All rights reserved.</p>
+        </div>
+</body>
+</html>

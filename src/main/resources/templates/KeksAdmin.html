@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keks Admin Dashboard</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f5eb;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Variables */
+        :root {
+            --primary-color: #d5b54d;
+            --primary-light: #f8f5eb;
+            --primary-dark: #b89a3e;
+            --border-color: #e9ddb5;
+            --text-color: #333;
+            --text-muted: #666;
+            --white: #fff;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #eab308;
+            --blue: #3b82f6;
+            --purple: #9333ea;
+            --orange: #f97316;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .sidebar-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-group-label {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu-item {
+            padding: 0.5rem 1rem;
+        }
+
+        .sidebar-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            width: 100%;
+            border-radius: 0.375rem;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-menu-button:hover {
+            background-color: var(--primary-light);
+        }
+
+        .sidebar-menu-button.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .sidebar-menu-button svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details {
+            font-size: 0.875rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 60px;
+        }
+
+        .header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-button {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .notification-button:hover {
+            background-color: var(--primary-light);
+        }
+
+        .notification-indicator {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: var(--red);
+            border-radius: 50%;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .date-selector:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Dashboard Content */
+        .dashboard {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .dashboard-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-tab {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .dashboard-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        /* Stats Card */
+        .stats-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .stats-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .stats-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: rgba(213, 181, 77, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .stats-trend.positive {
+            color: var(--green);
+        }
+
+        .stats-trend.negative {
+            color: var(--red);
+        }
+
+        /* Activity Grid */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Map */
+        .map-container {
+            height: 300px;
+            position: relative;
+            background-color: rgba(248, 245, 235, 0.5);
+            overflow: hidden;
+        }
+
+        .map-grid {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+        }
+
+        .map-grid-cell {
+            border: 1px solid rgba(213, 181, 77, 0.1);
+        }
+
+        .map-road-horizontal {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1rem;
+            background-color: rgba(213, 181, 77, 0.2);
+            transform: translateY(-50%);
+        }
+
+        .map-road-vertical {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 1rem;
+            background-color: rgba(213, 181, 77, 0.2);
+            transform: translateX(-50%);
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-marker.active {
+            background-color: var(--green);
+        }
+
+        .map-marker.idle {
+            background-color: var(--yellow);
+        }
+
+        .map-marker.offline {
+            background-color: var(--red);
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .map-control-button {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.375rem;
+            background-color: var(--white);
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .map-legend {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .map-legend-color {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+        }
+
+        /* Activity Timeline */
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-indicator {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .activity-indicator.active {
+            background-color: var(--green);
+        }
+
+        .activity-indicator.completed {
+            background-color: var(--blue);
+        }
+
+        .activity-indicator.offline {
+            background-color: var(--red);
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-rider {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .activity-details {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background-color: var(--primary-light);
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th.text-right {
+            text-align: right;
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table td.text-right {
+            text-align: right;
+        }
+
+        .table-search {
+            position: relative;
+            width: 16rem;
+        }
+
+        .table-search input {
+            width: 100%;
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table-search svg {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: rgb(22, 101, 52);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: rgb(153, 27, 27);
+        }
+
+        .status-badge.pending {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: rgb(133, 100, 4);
+        }
+
+        .status-badge.completed {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: rgb(30, 64, 175);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(213, 181, 77, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            background-color: var(--white);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Charts */
+        .chart {
+            height: 200px;
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 150px;
+            gap: 0.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chart-bar {
+            flex: 1;
+            background-color: var(--primary-color);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -1.5rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        .chart-legend-color {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 2px;
+        }
+
+        /* Customer Management */
+        .customer-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .customer-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-details {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .customer-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .customer-stat {
+            font-size: 0.75rem;
+        }
+
+        .customer-stat-value {
+            font-weight: 600;
+        }
+
+        /* Rider Management */
+        .rider-profile {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .rider-avatar {
+            width: 5rem;
+            height: 5rem;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .rider-info {
+            flex: 1;
+        }
+
+        .rider-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .rider-id {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .rider-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .rider-detail {
+            font-size: 0.875rem;
+        }
+
+        .rider-detail-label {
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .rider-detail-value {
+            font-weight: 500;
+        }
+
+        .rider-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Ride Management */
+        .ride-request {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ride-request-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .ride-request-id {
+            font-weight: 600;
+        }
+
+        .ride-request-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .ride-request-details {
+            margin-bottom: 0.5rem;
+        }
+
+        .ride-request-route {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ride-request-location {
+            font-size: 0.875rem;
+        }
+
+        .ride-request-arrow {
+            color: var(--text-muted);
+        }
+
+        .ride-request-customer {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ride-request-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Settings */
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+        .settings-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-option-label {
+            font-weight: 500;
+        }
+
+        .settings-option-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .toggle {
+            position: relative;
+            width: 3rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            background-color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--white);
+            transition: transform 0.2s;
+        }
+
+        .toggle.active {
+            background-color: var(--primary-color);
+        }
+
+        .toggle.active::after {
+            transform: translateX(1.5rem);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-title, .sidebar-group-label, .sidebar-menu-button span, .user-details {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">Keks Admin</h1>
+            
+        </div>
+        <div class="sidebar-content">
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Dashboard</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/admin-dashboard}" style="text-decoration: none;"><button class="sidebar-menu-button active">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            <span>Overview</span>
+                        </button></a>
+                    </li>
+                    
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Management</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/admin-riders}" style="text-decoration: none;"><button class="sidebar-menu-button" onclick="window.location.href ='Riders.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Riders</span>
+                        </button></a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/admin-customers}" style="text-decoration: none;"><button class="sidebar-menu-button"onclick="window.location.href ='Customers.html'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>Customers</span>
+                        </button></a>
+                    </li>
+                   
+                   
+                </ul>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label">Finance</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a th:href="@{/earnings}" style="text-decoration: none;"><button class="sidebar-menu-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                            <span>Earnings</span>
+                        </button></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">G</div>
+                <div class="user-details">
+                    <div class="user-name">Admin User</div>
+                    <div class="user-email">Awarungbenga@keke.com</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="header">
+            <div class="header-left">
+               
+                <h1 class="header-title">Keks Admin Dashboard</h1>
+            </div>
+            <div class="header-right">
+
+            </div>
+        </header>
+
+        <div class="dashboard">
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <!-- Daily Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Daily Rides</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-card-content">
+                            <div class="stats-row">
+                                <div>
+                                    <div class="stats-label">Total Rides</div>
+                                    <div th:if="${totalDailyRides != null}" th:text="${totalDailyRides}" class="stats-value"></div>
+                                    <div th:unless="${totalDailyRides != null}" class="stats-value">0</div>
+                                </div>
+                                <div class="stats-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d5b54d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                                </div>
+                            </div>
+                            <div class="stats-row">
+                                <div>
+                                    <div class="stats-label">Total Earnings</div>
+                                    <div th:if="${dailyEarnings != null}" th:text="'₦' + ${dailyEarnings}" class="stats-value"></div>
+                                    <div th:unless="${dailyEarnings != null}" class="stats-value">₦0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Riders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Active Riders</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-card-content">
+                            <div class="stats-row">
+                                <div>
+                                    <div class="stats-label">Online Riders</div>
+                                    <div th:text="${numberOfRiders}" class="stats-value"></div>
+                                </div>
+                                <div class="stats-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d5b54d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                            </div>
+                            <div class="stats-row">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Customer Activity</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-card-content">
+                            <div class="stats-row">
+                                <div>
+                                    <div class="stats-label">Active Customers</div>
+                                    <div th:text="${numberOfStudents}" class="stats-value"></div>
+                                </div>
+                                <div class="stats-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d5b54d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                            </div>
+                            <div class="stats-row">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Revenue</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-card-content">
+                            <div class="stats-row">
+                                <div>
+                                    <div class="stats-label">Today's Revenue</div>
+                                    <div th:if="${dailyEarnings != null}" th:text="'₦' + ${dailyEarnings}" class="stats-value"></div>
+                                    <div th:unless="${dailyEarnings != null}" class="stats-value">₦0</div>
+                                </div>
+                            </div>
+                            <div class="stats-row">
+                                <div>
+                                    <div class="stats-label">Platform Fee</div>
+                                    <div th:if="${dailyEarnings != null}" th:text="'₦' + ${dailyEarnings * 0.1}" class="stats-value"></div>
+                                    <div th:unless="${dailyEarnings != null}" class="stats-value">₦0</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Rider Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Rider Management</h2>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="table-search">
+                           
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="card-content p-0">
+                    <div class="tabs">
+                        <div class="tab active">All Riders</div>
+                      
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Rider Name</th>
+                                    <th>ID</th>
+                                    <th>Location</th>
+                                    <th class="text-middle">Rides Today</th>
+                                    <th class="text-right">Earnings</th>
+                                    <th class="text-right">Status</th>
+                                   
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="rider : ${riders}">
+                                    <td th:text="${rider.firstName} + ' ' + ${rider.lastName}" class="font-medium"></td>
+                                    <td th:text="${rider.riderId}"></td>
+                                    <td>Babcock</td>
+                                    <td th:text="${totalDailyRides}" class="text-middle"></td>
+                                    <div th:each="earning : ${pricePerRider}">
+                                        <td th:text="'₦' + ${earning.value}" class="text-right"></td>
+                                    </div>
+                                    <td class="text-right">
+                                        <span class="status-badge active">Active</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+                    </div>
+                </div>
+            </div>
+</body>
+</html>

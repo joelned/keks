@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-color: #ffd447; /* Dark gold/yellow */
+            --primary-dark: #d5b54d;
+            --primary-light: #F4E9C1;
+            --text-dark: #333333;
+            --text-light: #FFFFFF;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --input-border: #E0D4A0;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-image: url("C:/Users/maryam/Documents/KEKS/joshua-oluwagbemiga-t6nqZ0n3i-k-unsplash.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        .container {
+            max-width: 800px; /* Increased width to accommodate horizontal layout */
+            width: 100%;
+            z-index: 2;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-light);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            padding: 30px;
+            margin-bottom: 20px;
+            display: flex; /* Make card a flex container */
+            flex-direction: row; /* Horizontal layout */
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 0; /* Removed bottom margin */
+            margin-right: 30px; /* Added right margin for spacing */
+            flex: 0 0 250px; /* Fixed width for the left side */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+        
+        /* Form Styles */
+        form {
+            flex: 1; /* Take remaining space */
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+        
+        .form-text {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+        }
+        
+        /* Footer Styles */
+        .card-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--input-border);
+        }
+        
+        .footer-text {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+        }
+        
+        .footer-link {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .page-footer {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            opacity: 0.8;
+            z-index: 2;
+        }
+        
+        /* Decorative Elements */
+        .keke-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .keke-icon span {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .card {
+                flex-direction: column; /* Stack vertically on smaller screens */
+            }
+            
+            .card-header {
+                margin-right: 0;
+                margin-bottom: 25px;
+                flex: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">KekeRide</div>
+            <div class="tagline">Babcock Transportation Made Easy</div>
+        </header>
+        
+        <!-- Registration Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="keke-icon">
+                    <span>🛺</span>
+                </div>
+                <h1 class="card-title">Login</h1>
+               
+            </div>
+            
+            <form th:action="@{/api/v1/auth/login}" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input name="userId" type="text" id="username" class="form-control" placeholder="Enter your User ID" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input name="password" type="password" id="password" class="form-control" placeholder="Create a password" required>
+                    <small class="form-text">Use at least 8 characters with a mix of letters, numbers & symbols</small>
+                </div>
+                
+               
+                <button type="submit" class="btn btn-primary">Login</button>
+                
+                <div class="card-footer">
+                    <p class="footer-text">
+                        Don't already have an account? <a th:href="@{/}" class="footer-link">Register</a>
+                    </p>
+                  </div>
+
+                <br>
+                <p style="color: #006400; align-content:center;" th:text="${success}"></p>
+                <p style="color: #FF0000; align-content:center;" th:text="${error}"></p>
+            </form>
+        </div>
+    </div>
+    
+    <footer class="page-footer">
+        &copy; 2023 KekeRide Transportation Services. All rights reserved.
+    </footer>
+</body>
+</html>
+

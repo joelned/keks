@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEKS - Schedule Rides</title>
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-yellow: #ffd447;
+            --secondary-yellow: #d5b54d;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --light-bg: #f9f9f9;
+            --accent-dark: #8d7b2f;
+            --accent-light: #fff5d1;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #2e7d32;
+            --warning-color: #f57f17;
+            --danger-color: #c62828;
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        /* Header Styles */
+        .header {
+            background-color: var(--primary-yellow);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--light-text);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .nav-item.active {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+            font-weight: bold;
+        }
+        
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--secondary-yellow);
+        }
+        
+        .page-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: var(--dark-text);
+            opacity: 0.8;
+        }
+        
+        /* Calendar Section */
+        .calendar-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-yellow);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-light);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .calendar-month {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .calendar-arrow {
+            width: 30px;
+            height: 30px;
+            background-color: var(--accent-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .calendar-arrow:hover {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            color: var(--accent-dark);
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--accent-light);
+        }
+        
+        .calendar-day.active {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+            border-color: var(--secondary-yellow);
+        }
+        
+        .calendar-day.has-rides {
+            border-color: var(--secondary-yellow);
+            position: relative;
+        }
+        
+        .calendar-day.has-rides::after {
+            content: "";
+            position: absolute;
+            bottom: 5px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+        }
+        
+        .calendar-day.active.has-rides::after {
+            background-color: var(--light-text);
+        }
+        
+        .day-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        /* Scheduled Rides Section */
+        .scheduled-rides {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .rides-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .date-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary-yellow);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-yellow);
+            color: var(--dark-text);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-dark);
+            color: var(--light-text);
+        }
+        
+        .rides-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .ride-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .ride-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .ride-info {
+            flex: 1;
+        }
+        
+        .ride-time {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--secondary-yellow);
+        }
+        
+        .ride-route {
+            margin-bottom: 5px;
+        }
+        
+        .ride-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .ride-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn {
+            background-color: var(--accent-light);
+            color: var(--accent-dark);
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .cancel-btn {
+            background-color: #ffebee;
+            color: var(--danger-color);
+        }
+        
+        .cancel-btn:hover {
+            background-color: var(--danger-color);
+            color: var(--light-text);
+        }
+        
+        .no-rides {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Schedule Form */
+        .schedule-form {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-yellow);
+        }
+        
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 20px 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-menu {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .calendar-grid {
+                gap: 5px;
+            }
+            
+            .calendar-day-header, .day-number {
+                font-size: 0.9rem;
+            }
+            
+            .ride-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .ride-actions {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-light);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--secondary-yellow);
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-text);
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-form .form-group:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">K</div>
+                <div class="logo-text">KEKS</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="StudentDashboard.html" class="nav-item">Home</a>
+                <a href="schedule.html" class="nav-item active">Schedule</a>
+                <a href="Profilee.html" class="nav-item">Profile</a>
+               
+               
+            </nav>
+            
+           
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Schedule Rides</h1>
+        <p class="page-subtitle">Plan your campus transportation in advance by scheduling keke rides for your classes and activities.</p>
+        
+        
+        
+        <!-- Scheduled Rides Section -->
+        <section class="scheduled-rides">
+            <div class="rides-header">
+                <h2 class="section-title">Scheduled Rides for November 15, 2023</h2>
+                <div class="date-display">Wednesday</div>
+            </div>
+            
+            <div class="rides-list" id="rides-list">
+                <div class="ride-card" data-id="1">
+                    <div class="ride-info">
+                        <div class="ride-time">8:30 AM</div>
+                        <div class="ride-route">Hostel A → Science Building</div>
+                        <div class="ride-details">1 passenger • Recurring every Wednesday</div>
+                    </div>
+                    <div class="ride-actions">
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn cancel-btn">Cancel</button>
+                    </div>
+                </div>
+                
+                <div class="ride-card" data-id="2">
+                    <div class="ride-info">
+                        <div class="ride-time">1:15 PM</div>
+                        <div class="ride-route">Science Building → Cafeteria</div>
+                        <div class="ride-details">1 passenger • One-time ride</div>
+                    </div>
+                    <div class="ride-actions">
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn cancel-btn">Cancel</button>
+                    </div>
+                </div>
+                
+                <div class="ride-card" data-id="3">
+                    <div class="ride-info">
+                        <div class="ride-time">4:45 PM</div>
+                        <div class="ride-route">Library → Hostel A</div>
+                        <div class="ride-details">2 passengers • Recurring every Monday, Wednesday, Friday</div>
+                    </div>
+                    <div class="ride-actions">
+                        <button class="action-btn edit-btn">Edit</button>
+                        <button class="action-btn cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rides-header" style="margin-top: 30px;">
+                <a href="#schedule-form" class="btn btn-primary">+ Schedule New Ride</a>
+            </div>
+        </section>
+        
+        <!-- Schedule Form -->
+        <section id="schedule-form" class="schedule-form">
+            <h2 class="section-title">Schedule a New Ride</h2>
+            
+            <form class="form-grid" id="new-ride-form">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" value="2023-11-15" id="ride-date">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Time</label>
+                    <input type="time" class="form-control" id="ride-time">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Pickup Location</label>
+                    <input type="text" class="form-control" id="ride-pickup">
+                </div>
+                
+                
+                <div class="form-group">
+                    <label class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="ride-destination">
+                    
+                </div>
+                
+               
+                
+                <div class="form-group">
+                    <label class="form-label">Number of Passengers</label>
+                    <select class="form-control" id="ride-passengers">
+                        <option value="1">1 Person</option>
+                        <option value="2">2 People</option>
+                        <option value="3">3 People</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Recurrence</label>
+                    <select class="form-control" id="ride-recurrence">
+                        <option value="once">One-time ride</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekdays">Weekdays (Mon-Fri)</option>
+                        <option value="weekly">Weekly on this day</option>
+                        <option value="custom">Custom schedule</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes for Driver</label>
+                    <textarea class="form-control" rows="3" placeholder="Any special instructions or notes" id="ride-notes"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="reset" class="btn" style="background-color: #f5f5f5;">Reset</button>
+                    <button type="submit" class="btn btn-primary">Schedule Ride</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Edit Ride Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Scheduled Ride</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form class="modal-form" id="edit-ride-form">
+                <input type="hidden" id="edit-ride-id">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="edit-ride-date">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Time</label>
+                    <input type="time" class="form-control" id="edit-ride-time">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Pickup Location</label>
+                    <input type="text" class="form-control" id="edit-ride-pickup">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="edit-ride-destination">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Number of Passengers</label>
+                    <select class="form-control" id="edit-ride-passengers">
+                        <option value="1">1 Person</option>
+                        <option value="2">2 People</option>
+                        <option value="3">3 People</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Recurrence</label>
+                    <select class="form-control" id="edit-ride-recurrence">
+                        <option value="once">One-time ride</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekdays">Weekdays (Mon-Fri)</option>
+                        <option value="weekly">Weekly on this day</option>
+                        <option value="custom">Custom schedule</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes for Driver</label>
+                    <textarea class="form-control" rows="3" id="edit-ride-notes"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn" style="background-color: #f5f5f5;" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+   
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 KEKS - University Keke Transportation. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Get DOM elements
+        const ridesList = document.getElementById('rides-list');
+        const newRideForm = document.getElementById('new-ride-form');
+        const editModal = document.getElementById('edit-modal');
+        const editRideForm = document.getElementById('edit-ride-form');
+        const closeModalBtn = document.querySelector('.close-modal');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        
+        // Store the current ride being edited
+        let currentEditRideId = null;
+        
+        // Function to format time from input (HH:MM) to display format (H:MM AM/PM)
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            
+            const [hours, minutes] = timeString.split(':');
+            let hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            
+            hour = hour % 12;
+            hour = hour ? hour : 12; // Convert 0 to 12
+            
+            return `${hour}:${minutes} ${ampm}`;
+        }
+        
+        // Function to get recurrence text
+        function getRecurrenceText(recurrence, passengers) {
+            const passengerText = passengers === '1' ? '1 passenger' : `${passengers} passengers`;
+            
+            switch(recurrence) {
+                case 'once':
+                    return `${passengerText} • One-time ride`;
+                case 'daily':
+                    return `${passengerText} • Recurring daily`;
+                case 'weekdays':
+                    return `${passengerText} • Recurring weekdays (Mon-Fri)`;
+                case 'weekly':
+                    return `${passengerText} • Recurring every Wednesday`;
+                case 'custom':
+                    return `${passengerText} • Recurring every Monday, Wednesday, Friday`;
+                default:
+                    return passengerText;
+            }
+        }
+        
+        // Function to create a new ride card
+        function createRideCard(rideData) {
+            const rideCard = document.createElement('div');
+            rideCard.className = 'ride-card';
+            rideCard.dataset.id = rideData.id;
+            
+            const formattedTime = formatTime(rideData.time);
+            const recurrenceText = getRecurrenceText(rideData.recurrence, rideData.passengers);
+            
+            rideCard.innerHTML = `
+                <div class="ride-info">
+                    <div class="ride-time">${formattedTime}</div>
+                    <div class="ride-route">${rideData.pickup} → ${rideData.destination}</div>
+                    <div class="ride-details">${recurrenceText}</div>
+                </div>
+                <div class="ride-actions">
+                    <button class="action-btn edit-btn">Edit</button>
+                    <button class="action-btn cancel-btn">Cancel</button>
+                </div>
+            `;
+            
+            // Add event listeners to the buttons
+            const editBtn = rideCard.querySelector('.edit-btn');
+            const cancelBtn = rideCard.querySelector('.cancel-btn');
+            
+            editBtn.addEventListener('click', () => openEditModal(rideData.id));
+            cancelBtn.addEventListener('click', () => deleteRide(rideData.id));
+            
+            return rideCard;
+        }
+        
+        // Function to add a new ride
+        function addRide(rideData) {
+            // Generate a unique ID for the ride
+            rideData.id = Date.now().toString();
+            
+            // Create and append the ride card
+            const rideCard = createRideCard(rideData);
+            ridesList.appendChild(rideCard);
+            
+            // Scroll to the new ride
+            rideCard.scrollIntoView({ behavior: 'smooth' });
+            
+            return rideData.id;
+        }
+        
+        // Function to update an existing ride
+        function updateRide(rideId, rideData) {
+            const rideCard = document.querySelector(`.ride-card[data-id="${rideId}"]`);
+            if (!rideCard) return false;
+            
+            // Update the ride data
+            rideData.id = rideId;
+            
+            // Replace the old card with a new one
+            const newRideCard = createRideCard(rideData);
+            rideCard.replaceWith(newRideCard);
+            
+            return true;
+        }
+        
+        // Function to delete a ride
+        function deleteRide(rideId) {
+            const rideCard = document.querySelector(`.ride-card[data-id="${rideId}"]`);
+            if (!rideCard) return false;
+            
+            // Add a fade-out animation
+            rideCard.style.opacity = '0';
+            rideCard.style.transform = 'translateX(20px)';
+            rideCard.style.transition = 'opacity 0.3s, transform 0.3s';
+            
+            // Remove the card after animation
+            setTimeout(() => {
+                rideCard.remove();
+            }, 300);
+            
+            return true;
+        }
+        
+        // Function to open the edit modal
+        function openEditModal(rideId) {
+            const rideCard = document.querySelector(`.ride-card[data-id="${rideId}"]`);
+            if (!rideCard) return;
+            
+            // Get ride data from the card
+            const rideTime = rideCard.querySelector('.ride-time').textContent;
+            const rideRoute = rideCard.querySelector('.ride-route').textContent;
+            const rideDetails = rideCard.querySelector('.ride-details').textContent;
+            
+            // Parse the route to get pickup and destination
+            const [pickup, destination] = rideRoute.split(' → ');
+            
+            // Parse time back to input format (HH:MM)
+            let timeForInput = '';
+            if (rideTime) {
+                const [time, ampm] = rideTime.split(' ');
+                let [hours, minutes] = time.split(':');
+                hours = parseInt(hours);
+                
+                if (ampm === 'PM' && hours < 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0;
+                
+                timeForInput = `${hours.toString().padStart(2, '0')}:${minutes}`;
+            }
+            
+            // Determine passengers and recurrence from details
+            let passengers = '1';
+            let recurrence = 'once';
+            
+            if (rideDetails.includes('2 passengers')) passengers = '2';
+            if (rideDetails.includes('3 passengers')) passengers = '3';
+            
+            if (rideDetails.includes('Recurring daily')) recurrence = 'daily';
+            if (rideDetails.includes('Recurring weekdays')) recurrence = 'weekdays';
+            if (rideDetails.includes('Recurring every Wednesday')) recurrence = 'weekly';
+            if (rideDetails.includes('Recurring every Monday, Wednesday, Friday')) recurrence = 'custom';
+            
+            // Set form values
+            document.getElementById('edit-ride-id').value = rideId;
+            document.getElementById('edit-ride-date').value = '2023-11-15'; // Default to current date
+            document.getElementById('edit-ride-time').value = timeForInput;
+            document.getElementById('edit-ride-pickup').value = pickup;
+            document.getElementById('edit-ride-destination').value = destination;
+            document.getElementById('edit-ride-passengers').value = passengers;
+            document.getElementById('edit-ride-recurrence').value = recurrence;
+            document.getElementById('edit-ride-notes').value = '';
+            
+            // Store the current ride ID
+            currentEditRideId = rideId;
+            
+            // Show the modal
+            editModal.style.display = 'flex';
+        }
+        
+        // Function to close the edit modal
+        function closeEditModal() {
+            editModal.style.display = 'none';
+            currentEditRideId = null;
+        }
+        
+        // Event listener for new ride form submission
+        newRideForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const rideData = {
+                date: document.getElementById('ride-date').value,
+                time: document.getElementById('ride-time').value,
+                pickup: document.getElementById('ride-pickup').value,
+                destination: document.getElementById('ride-destination').value,
+                passengers: document.getElementById('ride-passengers').value,
+                recurrence: document.getElementById('ride-recurrence').value,
+                notes: document.getElementById('ride-notes').value
+            };
+            
+            // Validate required fields
+            if (!rideData.time || !rideData.pickup || !rideData.destination) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Add the ride
+            addRide(rideData);
+            
+            // Reset the form
+            newRideForm.reset();
+            
+            // Scroll back to the rides list
+            document.querySelector('.scheduled-rides').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Event listener for edit form submission
+        editRideForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const rideData = {
+                date: document.getElementById('edit-ride-date').value,
+                time: document.getElementById('edit-ride-time').value,
+                pickup: document.getElementById('edit-ride-pickup').value,
+                destination: document.getElementById('edit-ride-destination').value,
+                passengers: document.getElementById('edit-ride-passengers').value,
+                recurrence: document.getElementById('edit-ride-recurrence').value,
+                notes: document.getElementById('edit-ride-notes').value
+            };
+            
+            // Validate required fields
+            if (!rideData.time || !rideData.pickup || !rideData.destination) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Update the ride
+            updateRide(currentEditRideId, rideData);
+            
+            // Close the modal
+            closeEditModal();
+        });
+        
+        // Event listeners for closing the modal
+        closeModalBtn.addEventListener('click', closeEditModal);
+        cancelEditBtn.addEventListener('click', closeEditModal);
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+        });
+        
+        // Add event listeners to existing edit buttons
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const rideCard = button.closest('.ride-card');
+                openEditModal(rideCard.dataset.id);
+            });
+        });
+        
+        // Add event listeners to existing cancel buttons
+        document.querySelectorAll('.cancel-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const rideCard = button.closest('.ride-card');
+                deleteRide(rideCard.dataset.id);
+            });
+        });
+    </script>
+</body>
+</html>

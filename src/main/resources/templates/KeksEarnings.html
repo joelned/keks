@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keks - Admin Earnings Dashboard</title>
+    <style>
+        :root {
+            --primary: #d6c860;
+            --primary-light: #e6d98a;
+            --primary-dark: #b5a840;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+            --background: #f9f7e8;
+            --card-bg: #ffffff;
+            --border: #e0d980;
+            --admin-highlight: #e6b860;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            padding: 16px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .admin-badge {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-period {
+            font-size: 14px;
+            color: #666;
+            background-color: var(--primary-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .earnings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .earnings-table th {
+            text-align: left;
+            padding: 12px 16px;
+            background-color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .earnings-table th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .earnings-table th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            text-align: right;
+        }
+
+        .earnings-table td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .earnings-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .rider-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rider-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .admin-row {
+            background-color: var(--admin-highlight);
+            font-weight: 600;
+        }
+
+        .admin-row td {
+            border-bottom: none;
+        }
+
+        .total-row {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .total-row td {
+            padding-top: 20px;
+            border-bottom: none;
+        }
+
+        .daily-card {
+            border-top: 5px solid var(--primary-light);
+        }
+
+        .weekly-card {
+            border-top: 5px solid var(--primary);
+        }
+
+        .monthly-card {
+            border-top: 5px solid var(--primary-dark);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .card {
+                padding: 16px;
+                overflow-x: auto;
+            }
+            
+            .earnings-table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Keks</div>
+            <div class="admin-badge">Admin Dashboard</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">Earnings Overview</h1>
+        <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #e0e0e0;
+        }
+        .back-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+    </style>
+    
+    <body>
+        <a th:href="@{/admin-dashboard}"><button class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>
+        </button></a>
+        
+        <div class="earnings-grid">
+            <!-- Daily Earnings Card -->
+            <div class="card daily-card" th:each="ride : ${ridesPerRider}">
+                <div class="card-header">
+                    <div class="card-title">Daily Earnings</div>
+                    <div class="card-period">Mar 13, 2025</div>
+                </div>
+                
+                <table class="earnings-table">
+                    <thead>
+                        <tr>
+                            <th>Rider</th>
+                            <th>Trips</th>
+                            <th>Earnings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="rider : ${riders}">
+                            <td>
+                                <div class="rider-name">
+                                    <div th:text="${#strings.substring(rider.firstName, 0, 1)}" class="rider-avatar"></div>
+                                    <div th:text="${rider.firstName} + ' ' + ${rider.lastName}"></div>
+                                </div>
+                            </td>
+                            <td th:if="${ride.value != null}" th:text="${ride.value}"></td>
+                            <div th:each="perDay : ${earningsPerDay}">
+                                <td th:if = "${perDay != null}" th:text="'₦' + ${perDay[1]}"></td>
+                                <td th:unless= "${perDay != null}">₦0</td>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Weekly Earnings Card -->
+            <div class="card weekly-card" th:each="ride : ${ridesPerRider}">
+                <div class="card-header">
+                    <div class="card-title">Weekly Earnings</div>
+                </div>
+                
+                <table class="earnings-table">
+                    <thead>
+                        <tr>
+                            <th>Rider</th>
+                            <th>Trips</th>
+                            <th>Earnings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="rider : ${riders}">
+                            <td>
+                                <div class="rider-name">
+                                    <div th:text="${#strings.substring(rider.firstName, 0, 1)}" class="rider-avatar"></div>
+                                    <div th:text="${rider.firstName} + ' ' + ${rider.lastName}"></div>
+                                </div>
+                            </td>
+                            <td th:if="${ride.value != null}" th:text="${ride.value}"></td>
+                            <div th:each="perWeek: ${earningsPerWeek}">
+                                <td th:if = "${perWeek != null}" th:text="'₦' + ${perWeek[2]}"></td>
+                                <td th:unless= "${perWeek != null}">₦0</td>
+                            </div>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3">Total Weekly Earnings</td>
+                            <td>₦200</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Monthly Earnings Card -->
+            <div class="card monthly-card">
+                <div class="card-header">
+                    <div class="card-title">Monthly Earnings</div>
+                    <div class="card-period">Mar 1 - Mar 13, 2025</div>
+                </div>
+                
+                <table class="earnings-table">
+                    <thead>
+                        <tr>
+                            <th>Rider</th>
+                            <th>Trips</th>
+                            <th>Weeks Active</th>
+                            <th>Earnings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="rider-name">
+                                    <div class="rider-avatar">2P</div>
+                                    <div>2 pac</div>
+                                </div>
+                            </td>
+                            <td>145</td>
+                            <td>2</td>
+                            <td>₦172,500</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3">Total Monthly Earnings</td>
+                            <td>₦880,693</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

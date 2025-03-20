@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEKS Driver Dashboard</title>
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-yellow: #ffd447;
+            --secondary-yellow: #d5b54d;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --light-bg: #f9f9f9;
+            --accent-dark: #8d7b2f;
+            --accent-light: #fff5d1;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #2e7d32;
+            --warning-color: #f57f17;
+            --danger-color: #c62828;
+        }
+        
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: var(--primary-yellow);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--light-text);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .nav-item.active {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background-color: var(--secondary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+            font-weight: bold;
+        }
+        
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Driver ID badge */
+        .driver-id {
+            background-color: var(--accent-light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--accent-dark);
+            border: 1px solid var(--secondary-yellow);
+        }
+
+        /* Main content styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        main {
+            padding: 30px 0;
+        }
+
+        .page-title {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--secondary-yellow);
+            font-size: 1.8rem;
+        }
+
+        .filter-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .filter-button {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--accent-dark);
+        }
+
+        /* Ride cards grid */
+        .rides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .ride-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .ride-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .ride-header {
+            background-color: var(--accent-light);
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--accent-dark);
+            font-size: 1.1rem;
+        }
+
+        .ride-time {
+            color: var(--accent-dark);
+            font-size: 0.9rem;
+            margin-top: 3px;
+        }
+
+        .ride-details {
+            padding: 15px;
+        }
+
+        .location-info {
+            margin-bottom: 15px;
+        }
+
+        .location-label {
+            font-size: 0.8rem;
+            color: var(--accent-dark);
+            margin-bottom: 3px;
+        }
+
+        .location-value {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .location-icon {
+            color: var(--secondary-yellow);
+            margin-top: 2px;
+        }
+
+        .location-text {
+            font-weight: 500;
+        }
+
+        .ride-footer {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ride-distance {
+            font-weight: 500;
+            color: var(--accent-dark);
+        }
+
+        .accept-button {
+            background-color: var(--primary-yellow);
+            color: var(--dark-text);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .accept-button:hover {
+            background-color: var(--secondary-yellow);
+            color: var(--light-text);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px dashed var(--border-color);
+            margin-top: 20px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        /* Footer styles */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px 0;
+            color: var(--accent-dark);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-menu {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .rides-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with the exact style from the attached file -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">K</div>
+                <div class="logo-text">KEKS</div>
+            </div>
+            
+           
+                <a href="RiderBoard.html" class="nav-item active">Rider Dashboard</a>
+            </nav>
+            
+            <div class="driver-id" th:text="'ID: ' + ${kekeId}"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>Available Ride Requests</h1>
+                <div class="filter-dropdown">
+                </div>
+            </div>
+
+            <div class="rides-grid" th:each="ride : ${rideRequests}">
+                <!-- Ride Card 1 -->
+                <div class="ride-card">
+                    <form th:action="@{/api/v1/approve-request}" method="post">
+                    <div class="ride-header">
+                        <div class="student-info">
+                            <div th:text="${#strings.substring(ride.student.name, 0, 2)}" class="user-avatar"></div>
+                            <div>
+                                <div th:text="${ride.student.name}" class="student-name"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ride-details">
+                        <div class="location-info">
+                            <div class="location-label">PICKUP LOCATION</div>
+                            <div class="location-value">
+                                <div class="location-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div th:text="${ride.pickUpLocation}" class="location-text"></div>
+                            </div>
+                        </div>
+                        <div class="location-info">
+                            <div class="location-label">DESTINATION</div>
+                            <div class="location-value">
+                                <div class="location-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div th:text="${ride.destination}" class="location-text"></div>
+                            </div>
+                        </div>
+                    </div>
+                        <input type="hidden" name="rideId" th:value="${ride.rideId}">
+                    <div class="ride-footer">
+                        <button type="submit" class="accept-button">Accept Ride</button>
+                    </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="empty-state" th:if="${rideRequests == null}">
+                <div class="empty-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                </div>
+                <h3>No ride requests available</h3>
+                <p>There are currently no students requesting rides. Check back later!</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KEKS Transportation. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
