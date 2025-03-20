@@ -150,11 +150,13 @@ public class PageController implements ErrorController {
 
        List<Student> student = studentRepository.findAll();
 
+       List<Object[]>getPriceForToday = requestRepository.getTotalPriceForToday();
         model.addAttribute("numberOfRiders", numberOfRiders);
         model.addAttribute("numberOfStudents", numberOfStudents);
         model.addAttribute("riders", riders);
         model.addAttribute("totalDailyRides", totalDailyRides);
         model.addAttribute("pricePerRider", pricePerRider);
+        model.addAttribute("dailyEarnings", getPriceForToday);
         model.addAttribute("students", student);
         return "KeksAdmin";
     }

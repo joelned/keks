@@ -1195,7 +1195,7 @@
                             <div class="stats-row">
                                 <div>
                                     <div class="stats-label">Total Earnings</div>
-                                    <div th:if="${dailyEarnings != null}" th:text="'₦' + ${dailyEarnings}" class="stats-value"></div>
+                                    <div th:each="perDay : ${dailyEarnings}" th:if="${dailyEarnings != null}" th:text="'₦' + ${perDay[1]}" class="stats-value"></div>
                                     <div th:unless="${dailyEarnings != null}" class="stats-value">₦0</div>
                                 </div>
                             </div>
@@ -1257,14 +1257,14 @@
                             <div class="stats-row">
                                 <div>
                                     <div class="stats-label">Today's Revenue</div>
-                                    <div th:if="${dailyEarnings != null}" th:text="'₦' + ${dailyEarnings}" class="stats-value"></div>
+                                    <div th:each="perDay : ${dailyEarnings}" th:if="${dailyEarnings != null}" th:text="'₦' + ${perDay[1]}" class="stats-value"></div>
                                     <div th:unless="${dailyEarnings != null}" class="stats-value">₦0</div>
                                 </div>
                             </div>
                             <div class="stats-row">
                                 <div>
                                     <div class="stats-label">Platform Fee</div>
-                                    <div th:if="${dailyEarnings != null}" th:text="'₦' + ${dailyEarnings * 0.1}" class="stats-value"></div>
+                                    <div th:each="perDay : ${dailyEarnings}" th:if="${dailyEarnings != null}" th:text="'₦' + ${perDay[1] * 0.1}" class="stats-value"></div>
                                     <div th:unless="${dailyEarnings != null}" class="stats-value">₦0</div>
 
                                 </div>
